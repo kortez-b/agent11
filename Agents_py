@@ -1,0 +1,268 @@
+import pandas as pd
+from dataclasses import dataclass
+
+
+# =====================================
+# DATA CLASSES
+# =====================================
+
+@dataclass
+class Demand:
+    heating_peak_mw: float
+    cooling_peak_mw: float
+    heating_avg_mw: float
+    cooling_avg_mw: float
+    heating_energy_gwh: float
+    cooling_energy_gwh: float
+
+
+@dataclass
+class Resource:
+    depth_m: float
+    gradient_c_per_km: float
+    surface_temp_c: float
+    reservoir_temp_c: float
+    pressure_bar: float
+    permeability_md: float
+
+
+@dataclass
+class Design:
+    doublets: int
+    geothermal_mw: float
+    heat_pump_mw: float
+    cooling_mw: float
+    cooling_technology: str
+
+
+# =====================================
+# AGENT 1
+# DEMAND AGENT
+# =====================================
+
+def demand_agent():
+
+    heat = pd.read_csv(
+        "GEMINI_Heating_Demand_Daily_2027.csv"
+    )
+
+    cool = pd.read_csv(
+        "GEMINI_Cooling_Demand_Daily_2027.csv"
+    )
+
+    return Demand(
+        heating_peak_mw=heat["heating_demand_MWth"].max(),
+        cooling_peak_mw=cool["cooling_demand_MWcool"].max(),
+
+        heating_avg_mw=heat["heating_demand_MWth"].mean(),
+        cooling_avg_mw=cool["cooling_demand_MWcool"].mean(),
+
+        heating_energy_gwh=
+        heat["heating_demand_MWth"].sum() * 24 / 1000,
+
+        cooling_energy_gwh=
+        cool["cooling_demand_MWcool"].sum() * 24 / 1000
+    )
+
+
+# =====================================
+# AGENT 2
+# RESOURCE AGENT
+# =====================================
+
+def resource_agent():
+
+    depth = 2500
+    gradient = 30
+    surface_temp = 12
+
+    reservoir_temp = (
+        surface_temp +
+        gradient * (depth / 1000)
+    )
+
+    return Resource(
+        depth_m=depth,
+        gradient_c_per_km=gradient,
+        surface_temp_c=surface_temp,
+        reservoir_temp_c=reservoir_temp,
+        pressure_bar=250,
+        permeability_md=200
+    )
+
+
+# =====================================
+# AGENT 3
+# DESIGN AGENT
+# =====================================
+
+def design_agent(demand, resource):
+
+    return Design(
+        doublets=2,
+        geothermal_mw=15,
+        heat_pump_mw=15,
+        cooling_mw=10,
+        cooling_technology="electric chiller"
+    )
+
+
+# =====================================
+# AGENT 4
+# VALIDATION AGENT
+# =====================================
+
+def validation_agent(design, demand, resource):
+
+    violations = []
+
+    if design.doublets < 1:
+        violations.append(
+            "Less than 1 doublet"
+        )
+
+    if design.doublets > 3:
+        violations.append(
+            "More than 3 doublets"
+        )
+
+    if resource.reservoir_temp_c < 100 \
+       and design.heat_pump_mw == 0:
+
+        violations.append(
+            "Cannot reach 100°C supply temperature without heat pump"
+        )
+
+    total_heating_capacity = (
+        design.geothermal_mw +
+        design.heat_pump_mw
+    )
+
+    if total_heating_capacity < demand.heating_peak_mw:
+
+        violations.append(
+            "Heating peak demand not fulfilled"
+        )
+
+    if design.cooling_mw < demand.cooling_peak_mw:
+
+        violations.append(
+            "Cooling peak demand not fulfilled"
+        )
+
+    return violations
+
+
+# =====================================
+# AGENT 5
+# REPORT AGENT
+# =====================================
+
+def report_agent(
+        demand,
+        resource,
+        design,
+        violations
+):
+
+    print("\n==========================")
+    print("FINAL DESIGN REPORT")
+    print("==========================")
+
+    print("\nDEMAND")
+
+    print(
+        f"Heating Peak: {demand.heating_peak_mw:.2f} MW"
+    )
+
+    print(
+        f"Cooling Peak: {demand.cooling_peak_mw:.2f} MW"
+    )
+
+    print(
+        f"Heating Energy: {demand.heating_energy_gwh:.2f} GWh"
+    )
+
+    print(
+        f"Cooling Energy: {demand.cooling_energy_gwh:.2f} GWh"
+    )
+
+    print("\nRESOURCE")
+
+    print(
+        f"Reservoir Temp: {resource.reservoir_temp_c:.1f} °C"
+    )
+
+    print(
+        f"Depth: {resource.depth_m} m"
+    )
+
+    print(
+        f"Pressure: {resource.pressure_bar} bar"
+    )
+
+    print("\nDESIGN")
+
+    print(
+        f"Doublets: {design.doublets}"
+    )
+
+    print(
+        f"Geothermal: {design.geothermal_mw} MW"
+    )
+
+    print(
+        f"Heat Pump: {design.heat_pump_mw} MW"
+    )
+
+    print(
+        f"Cooling: {design.cooling_mw} MW"
+    )
+
+    print(
+        f"Technology: {design.cooling_technology}"
+    )
+
+    if violations:
+
+        print("\nVIOLATIONS FOUND:")
+
+        for violation in violations:
+            print("-", violation)
+
+    else:
+
+        print("\nDESIGN VALID ✅")
+
+
+# =====================================
+# ORCHESTRATOR
+# =====================================
+
+def main():
+
+    demand = demand_agent()
+
+    resource = resource_agent()
+
+    design = design_agent(
+        demand,
+        resource
+    )
+
+    violations = validation_agent(
+        design,
+        demand,
+        resource
+    )
+
+    report_agent(
+        demand,
+        resource,
+        design,
+        violations
+    )
+
+
+if __name__ == "__main__":
+    main()

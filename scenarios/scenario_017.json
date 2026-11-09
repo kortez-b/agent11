@@ -1,0 +1,8 @@
+{
+    "scenario_id": 17,
+    "doublets": 3,
+    "geothermal_mw": 9.0,
+    "heat_pump_mw": 21.0,
+    "cooling_mw": 10.0,
+    "cooling_technology": "electric chiller"
+}

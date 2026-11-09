@@ -1,0 +1,36 @@
+{
+    "selected_configuration": {
+        "cfg_id": "D3_S0_A5",
+        "doublets": 3,
+        "storage_mwh": 25,
+        "hthp_mw": 6.0,
+        "abs_chiller_mw": 5.0,
+        "elec_chiller_mw": 5.0,
+        "total_capex_m": 46.77,
+        "lcoe_eur_mwh": 54.19,
+        "coverage_pct": 99.99,
+        "well_production_gwh": [
+            84.4,
+            43.33,
+            1.15
+        ],
+        "well_active_days": [
+            330,
+            178,
+            5
+        ],
+        "well_inactive_days": [
+            0,
+            152,
+            325
+        ],
+        "well_mean_flow_m3h": [
+            233.9,
+            222.7,
+            211.2
+        ]
+    },
+    "optimization_score": 85.5,
+    "operational_justification": "The selected configuration (D3_S0_A5) utilizes three doublets, providing a balanced approach to geothermal energy production with a total storage capacity of 25 MWh. This configuration achieves a high coverage percentage of 99.99%, ensuring reliability and minimal auxiliary gas usage (0.014 GWh). The well production rates are robust, with two active wells producing 84.4 GWh and 43.33 GWh, respectively, while maintaining a third well for backup, which allows for operational flexibility. The mean flow rates are adequate for sustaining production during peak demand periods. This architecture also allows for seasonal flexibility, as the lower HTHP of 6.0 MW enables efficient operation during varying thermal loads, making it suitable for both summer and winter demands.",
+    "decision_summary": "The D3_S0_A5 configuration is the optimal choice, balancing cost, coverage, and operational efficiency, while minimizing auxiliary gas usage."
+}
